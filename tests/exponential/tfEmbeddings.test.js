@@ -24,19 +24,22 @@ jest.mock('@tensorflow/tfjs-node', () => ({
   abs: jest.fn().mockReturnValue({}),
   square: jest.fn().mockReturnValue({}),
   dispose: jest.fn()
-}));
-
-jest.mock('@tensorflow/tfjs-node-gpu', () => ({}));
+}), { virtual: true });
+jest.mock('@tensorflow/tfjs-node-gpu', () => ({}), { virtual: true });
 jest.mock('@tensorflow-models/universal-sentence-encoder', () => ({
   load: jest.fn().mockResolvedValue({
-    embed: jest.fn().mockResolvedValue({
-      array: jest.fn().mockResolvedValue([
-        [0.1, 0.2, 0.3, 0.4, 0.5]
-      ]),
+    embed: jest.fn().mockImplementation(async texts => ({
+      array: jest
+        .fn()
+        .mockResolvedValue(
+          Array.isArray(texts)
+            ? texts.map(() => [0.1, 0.2, 0.3, 0.4, 0.5])
+            : [[0.1, 0.2, 0.3, 0.4, 0.5]]
+        ),
       dispose: jest.fn()
-    })
+    }))
   })
-}));
+}), { virtual: true });
 
 jest.mock('node-fetch', () => 
   jest.fn().mockResolvedValue({
