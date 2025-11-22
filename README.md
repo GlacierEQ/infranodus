@@ -26,6 +26,7 @@
 * Use InfraNodus to interface with your Neo4J database and to try some basic graph constructs using an easy input procedure via natural language, voice-to-text, or #hashtags
 * Automated dependency upgrades with `scripts/upgrade_and_combos.sh`
   * Supports dry-run mode: `bash scripts/upgrade_and_combos.sh -n`
+  * Dry-run skips installing `node_modules`
   * Group upgrades by prefix delimiter (default `-`)
 * Forensic-level file organization using `scripts/case_file_organizer.sh`
 

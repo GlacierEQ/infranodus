@@ -55,28 +55,28 @@ if [ ! -f "$REPORT_JSON" ]; then
     echo '{"upgrades": [], "combos": {}}' > "$REPORT_JSON"
 fi
 
-# Ensure dependencies are installed
+# Ensure dependencies are installed when not in dry-run mode
 if [ ! -d "$NODE_MODULES" ]; then
-    log "node_modules not found. Installing dependencies"
-    npm install >>"$LOGFILE" 2>&1
+    if [ "$DRY_RUN" = false ]; then
+        log "node_modules not found. Installing dependencies"
+        npm install >>"$LOGFILE" 2>&1
+    else
+        log "node_modules not found but dry-run enabled; skipping install"
+    fi
 fi
 
 temp_outdated=$(mktemp)
 
 log "Checking for outdated dependencies"
-if ! npm outdated --json > "$temp_outdated" 2>>"$LOGFILE"; then
-    log "No outdated dependencies or npm error"
+npm outdated --json > "$temp_outdated" 2>>"$LOGFILE" || true
+
+if [ ! -s "$temp_outdated" ]; then
+    log "All dependencies up to date or npm error"
     echo '{"upgrades": [], "combos": {}}' > "$REPORT_JSON"
     rm -f "$temp_outdated"
     exit 0
 fi
 
-if [ ! -s "$temp_outdated" ]; then
-    log "All dependencies up to date"
-    echo '{"upgrades": [], "combos": {}}' > "$REPORT_JSON"
-    rm -f "$temp_outdated"
-    exit 0
-fi
 
 # Parse outdated dependencies and update them
 update_list=$(jq -r 'keys[]' "$temp_outdated")
