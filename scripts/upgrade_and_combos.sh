@@ -6,8 +6,26 @@
 
 set -euo pipefail
 
-# Allow custom concurrency via CONCURRENCY env variable (default 4)
+# Default settings
+DRY_RUN=false
+COMBO_DELIM="${COMBO_DELIM:--}"
 CONCURRENCY="${CONCURRENCY:-4}"
+
+usage() {
+  echo "Usage: $0 [-n] [-c concurrency] [-d delimiter]" >&2
+  echo "  -n  Dry run. Report upgrades without installing." >&2
+  echo "  -c  Number of parallel installs (default $CONCURRENCY)." >&2
+  echo "  -d  Delimiter for grouping combos (default '$COMBO_DELIM')." >&2
+}
+
+while getopts "nc:d:" opt; do
+  case "$opt" in
+    n) DRY_RUN=true ;;
+    c) CONCURRENCY="$OPTARG" ;;
+    d) COMBO_DELIM="$OPTARG" ;;
+    *) usage; exit 1 ;;
+  esac
+done
 
 WORKDIR="$(cd "$(dirname "$0")/.." && pwd)"
 PACKAGE_JSON="$WORKDIR/package.json"
@@ -18,6 +36,13 @@ NODE_MODULES="$WORKDIR/node_modules"
 log() {
     echo "$(date '+%Y-%m-%d %H:%M:%S') - $1" | tee -a "$LOGFILE"
 }
+
+check_cmd() {
+  command -v "$1" >/dev/null 2>&1 || { echo "$1 command not found" >&2; exit 1; }
+}
+
+check_cmd npm
+check_cmd jq
 
 # Ensure package.json exists
 if [ ! -f "$PACKAGE_JSON" ]; then
@@ -62,15 +87,21 @@ update_dep() {
     current=$(jq -r ".[\"$dep\"].current" "$temp_outdated")
     latest=$(jq -r ".[\"$dep\"].latest" "$temp_outdated")
     log "Updating $dep from $current to $latest"
-    if npm install "$dep@$latest" --save >>"$LOGFILE" 2>&1; then
+    if [ "$DRY_RUN" = true ]; then
         jq --arg name "$dep" --arg from "$current" --arg to "$latest" \
-           '.upgrades += [{name:$name, from:$from, to:$to}]' "$REPORT_JSON" > "$REPORT_JSON.tmp"
+           '.upgrades += [{name:$name, from:$from, to:$to, dry:true}]' "$REPORT_JSON" > "$REPORT_JSON.tmp"
         mv "$REPORT_JSON.tmp" "$REPORT_JSON"
     else
-        log "Failed to update $dep"
+        if npm install "$dep@$latest" --save >>"$LOGFILE" 2>&1; then
+            jq --arg name "$dep" --arg from "$current" --arg to "$latest" \
+               '.upgrades += [{name:$name, from:$from, to:$to}]' "$REPORT_JSON" > "$REPORT_JSON.tmp"
+            mv "$REPORT_JSON.tmp" "$REPORT_JSON"
+        else
+            log "Failed to update $dep"
+        fi
     fi
 
-    prefix=${dep%%-*}
+    prefix=${dep%%${COMBO_DELIM}*}
     if jq -e ".combos.\"$prefix\"" "$REPORT_JSON" >/dev/null; then
         jq --arg prefix "$prefix" --arg name "$dep" '.combos[$prefix] += [$name]' "$REPORT_JSON" > "$REPORT_JSON.tmp"
     else
