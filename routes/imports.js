@@ -23,6 +23,8 @@ var FlowdockText = require('flowdock-text')
 var validate = require('../lib/middleware/validate')
 var entries = require('../routes/entries')
 
+const { downloadSubtitles } = require('../lib/utils/youtubeSubtitles')
+
 var async = require('async')
 var Evernote = require('evernote')
 
@@ -2316,7 +2318,6 @@ exports.submit = function(req, res, next) {
             }
         })
     } else if (service == 'youtube') {
-        var youtubedl = require('youtube-dl')
 
         var statements = []
 
@@ -2385,19 +2386,14 @@ exports.submit = function(req, res, next) {
                 get_subtitles(ytoptions)
 
                 function get_subtitles(ytoptions) {
-                    youtubedl.getSubs(url, ytoptions, function(err, files) {
-                        if (err) {
-                            console.log(err)
-                            res.error(
-                                'Could not read the video file from the link. We only accept YouTube links like https://www.youtube.com/watch?v=-qgkB0XD4bM or http://youtu.be/-qgkB0XD4bM'
-                            )
-                            res.redirect('back')
-                        } else {
+                    downloadSubtitles(url, {
+                        language: ytoptions.lang,
+                        auto: ytoptions.auto,
+                    })
+                        .then(function(files) {
                             console.log('subtitle files downloaded:', files)
 
                             if (files[0]) {
-                                console.log(files[0])
-
                                 fs.readFile(files[0], 'utf8', function(
                                     err,
                                     contents
@@ -2577,7 +2573,11 @@ exports.submit = function(req, res, next) {
 
                                         // Minus 2 seconds + 2 seconds — propose to watch that fragment of video
                                     }
-                                    fs.unlink(files[0])
+                                    fs.unlink(files[0], function(unlinkErr) {
+                                        if (unlinkErr) {
+                                            console.error(unlinkErr)
+                                        }
+                                    })
                                 })
 
                                 // if files[0]
@@ -2589,20 +2589,21 @@ exports.submit = function(req, res, next) {
                                     )
                                     res.redirect('back')
                                 } else {
-                                    ytoptions = {
-                                        // Write automatic subtitle file (youtube only)
+                                    get_subtitles({
                                         auto: true,
-                                        // Downloads all the available subtitles.
                                         all: false,
-                                        // Languages of subtitles to download, separated by commas.
                                         lang: sublanguage,
-                                    }
-
-                                    get_subtitles(ytoptions)
+                                    })
                                 }
                             }
-                        }
-                    })
+                        })
+                        .catch(function(err) {
+                            console.log(err)
+                            res.error(
+                                'Could not read the video file from the link. We only accept YouTube links like https://www.youtube.com/watch?v=-qgkB0XD4bM or http://youtu.be/-qgkB0XD4bM'
+                            )
+                            res.redirect('back')
+                        })
                 }
             }
         })
