@@ -19,7 +19,7 @@
   "dependencies": {
     "@joegesualdo/get-youtube-subtitles-node": "^0.1.0",
     "bcrypt-nodejs": "0.0.3",
-    "body-parser": "^1.19.0",
+    "body-parser": "^1.20.4",
     "chargebee": "^2.4.3",
     "cheerio": "^1.0.0-rc.2",
     "cookie-parser": "^1.4.4",
@@ -27,7 +27,7 @@
     "ejs": "^2.7.2",
     "errorhandler": "^1.5.1",
     "evernote": "^2.0.5",
-    "express": "^4.17.1",
+    "express": "^4.22.0",
     "express-basic-auth": "^1.2.0",
     "express-session": "^1.17.0",
     "feedparser-promised": "^1.5.0",
@@ -62,7 +62,7 @@
     "twit": "^2.2.9",
     "unfluff": "^3.0.0",
     "wink-tokenizer": "^5.1.0",
-    "youtube-dl": "^1.12.2"
+    "youtube-dl": "^3.5.0"
   },
   "devDependencies": {
     "nodemon": "^1.18.10",
