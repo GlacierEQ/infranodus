@@ -65,9 +65,9 @@
     "youtube-dl": "^1.12.2"
   },
   "devDependencies": {
-    "nodemon": "^1.18.10",
+    "nodemon": "^2.0.0",
     "prettier": "^1.14.3",
     "jest": "^30.0.0",
-    "eslint": "^9.4.0"
+    "eslint": "^9.26.0"
   }
 }
