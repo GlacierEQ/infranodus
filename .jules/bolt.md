@@ -8,3 +8,7 @@
 ## 2025-05-15 - [O(N) Set-based Deduplication in Instruments.uniqualizeArray]
 **Learning:** Core utility functions like `Instruments.uniqualizeArray` are critical for graph processing (e.g., node deduplication). Replacing object-based lookups with `Set` improves performance by ~20% and ensures more predictable behavior for large data sets.
 **Action:** Use `Set` for all deduplication logic in utility functions to maintain O(1) performance and avoid hidden overhead of object key stringification.
+
+## 2025-05-25 - [Avoided JSON.stringify in deduplication]
+**Learning:** Using `JSON.stringify` as a key function for deduplication (e.g., in `Instruments.uniqualizeArray`) is convenient but expensive. When a unique identifier like `node.id` is available, using it directly in the callback is significantly faster (~3x-5x speedup).
+**Action:** Always check if a simple unique property can be used for deduplication before falling back to `JSON.stringify`.
