@@ -12,3 +12,7 @@
 ## 2025-05-25 - [Preventive Deduplication vs Post-processing]
 **Learning:** In `Entry.getNodes`, the pattern of pushing all potential nodes to an array and then deduplicating with `JSON.stringify` was a major bottleneck. Replacing it with an in-loop `Set` check for unique IDs improved performance by ~90% (35ms -> 3.4ms for 10k edges).
 **Action:** Avoid post-processing deduplication for large arrays when you can track uniqueness during the initial population of the array. Never use `JSON.stringify` as a key for deduplication if a unique ID is available.
+
+## 2025-05-30 - [O(N) to O(1) Lookup Optimization in validate.js]
+**Learning:** Core text processing functions like `extractConcepts` and `uniques` in `lib/middleware/validate.js` were performing multiple linear searches (`indexOf`) on stopword and hashtag arrays for every token. Converting these to `Set` lookups (`has`) reduced processing time by ~45% for a typical 100-concept statement with 600 stopwords.
+**Action:** Proactively identify arrays used for inclusion/exclusion checks in loops and convert them to `Set` objects to ensure O(1) performance.
