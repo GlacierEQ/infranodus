@@ -12,3 +12,11 @@
 ## 2025-05-25 - [Preventive Deduplication vs Post-processing]
 **Learning:** In `Entry.getNodes`, the pattern of pushing all potential nodes to an array and then deduplicating with `JSON.stringify` was a major bottleneck. Replacing it with an in-loop `Set` check for unique IDs improved performance by ~90% (35ms -> 3.4ms for 10k edges).
 **Action:** Avoid post-processing deduplication for large arrays when you can track uniqueness during the initial population of the array. Never use `JSON.stringify` as a key for deduplication if a unique ID is available.
+
+## 2025-05-30 - [O(N*M) to O(N+M) in extractConcepts]
+**Learning:** Found a recurring anti-pattern where core text processing logic used  lookups for large  and  arrays inside loops. This caused O(N*M) complexity in a very hot path.
+**Action:** Always check if reference arrays used for filtering or tagging can be converted to  objects for O(1) lookups.
+
+## 2025-05-30 - [O(N*M) to O(N+M) in extractConcepts]
+**Learning:** Found a recurring anti-pattern where core text processing logic used `Array.indexOf` lookups for large `stopwords` and `hashtags` arrays inside loops. This caused O(N*M) complexity in a very hot path.
+**Action:** Always check if reference arrays used for filtering or tagging can be converted to `Set` objects for O(1) lookups.
