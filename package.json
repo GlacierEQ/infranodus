@@ -21,7 +21,7 @@
     "bcrypt-nodejs": "0.0.3",
     "body-parser": "^1.19.0",
     "chargebee": "^2.4.3",
-    "cheerio": "^1.0.0-rc.2",
+    "cheerio": "^1.0.0",
     "cookie-parser": "^1.4.4",
     "csv-parse": "^4.4.6",
     "ejs": "^2.7.2",
@@ -51,7 +51,7 @@
     "pdfreader": "^0.2.4",
     "phantom": "^4.0.12",
     "phpmorphy-locutus": "^0.1.0",
-    "request-promise": "^4.2.2",
+    "request-promise": "^4.2.6",
     "send": "^0.16.2",
     "serve-favicon": "^2.5.0",
     "serve-static": "^1.14.1",
@@ -65,7 +65,7 @@
     "youtube-dl": "^1.12.2"
   },
   "devDependencies": {
-    "nodemon": "^1.18.10",
+    "nodemon": "^2.0.0",
     "prettier": "^1.14.3",
     "jest": "^30.0.0",
     "eslint": "^9.4.0"
