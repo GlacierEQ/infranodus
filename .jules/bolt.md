@@ -12,3 +12,7 @@
 ## 2025-05-25 - [Preventive Deduplication vs Post-processing]
 **Learning:** In `Entry.getNodes`, the pattern of pushing all potential nodes to an array and then deduplicating with `JSON.stringify` was a major bottleneck. Replacing it with an in-loop `Set` check for unique IDs improved performance by ~90% (35ms -> 3.4ms for 10k edges).
 **Action:** Avoid post-processing deduplication for large arrays when you can track uniqueness during the initial population of the array. Never use `JSON.stringify` as a key for deduplication if a unique ID is available.
+
+## 2025-06-05 - [O(N*M) to O(N+M) Optimization in extractConcepts]
+**Learning:** Core text processing functions like `extractConcepts` often perform multiple membership checks against `stopwords` and `hashtags` within loops. Using `Array.indexOf` creates an O(N*M) bottleneck. Converting these lists to `Set` objects for O(1) lookups significantly improves performance, especially for large documents or extensive stopword lists.
+**Action:** Always convert static or semi-static filter lists (stopwords, hashtags, categories) into `Set` objects before entering loops that perform membership testing.
