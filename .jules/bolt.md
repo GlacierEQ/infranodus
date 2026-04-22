@@ -12,3 +12,11 @@
 ## 2025-05-25 - [Preventive Deduplication vs Post-processing]
 **Learning:** In `Entry.getNodes`, the pattern of pushing all potential nodes to an array and then deduplicating with `JSON.stringify` was a major bottleneck. Replacing it with an in-loop `Set` check for unique IDs improved performance by ~90% (35ms -> 3.4ms for 10k edges).
 **Action:** Avoid post-processing deduplication for large arrays when you can track uniqueness during the initial population of the array. Never use `JSON.stringify` as a key for deduplication if a unique ID is available.
+
+## 2026-04-22 - [Optimized concept extraction with Set lookups]
+**Learning:**  in  used  for filtering against stopwords and hashtags. This led to O(N*M) complexity. Pre-converting these to  objects before the loops provides O(N+M) complexity, significantly improving performance when large custom stopword lists are used.
+**Action:** Always use  for frequent membership checks in loops, especially when the look-up set can be large or is provided by the user.
+
+## 2026-04-22 - [Optimized concept extraction with Set lookups]
+**Learning:** extractConcepts in lib/middleware/validate.js used Array.indexOf for filtering against stopwords and hashtags. This led to O(N*M) complexity. Pre-converting these to Set objects before the loops provides O(N+M) complexity, significantly improving performance when large custom stopword lists are used.
+**Action:** Always use Set for frequent membership checks in loops, especially when the look-up set can be large or is provided by the user.
