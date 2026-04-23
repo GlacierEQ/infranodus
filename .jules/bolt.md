@@ -12,3 +12,7 @@
 ## 2025-05-25 - [Preventive Deduplication vs Post-processing]
 **Learning:** In `Entry.getNodes`, the pattern of pushing all potential nodes to an array and then deduplicating with `JSON.stringify` was a major bottleneck. Replacing it with an in-loop `Set` check for unique IDs improved performance by ~90% (35ms -> 3.4ms for 10k edges).
 **Action:** Avoid post-processing deduplication for large arrays when you can track uniqueness during the initial population of the array. Never use `JSON.stringify` as a key for deduplication if a unique ID is available.
+
+## 2025-05-27 - [Neo4j Serialization and Logging Bottlenecks]
+**Learning:** Found two major bottlenecks in `lib/db/neo4j.js`: 1) `console.log(JSON.stringify(largeObject))` can account for >90% of execution time in data-heavy paths. 2) Neo4j's JavaScript driver requires standard `Array` objects for query parameters and will fail if passed a `Set`.
+**Action:** Always remove or guard expensive stringify logs in core paths. When using `Set` for O(1) deduplication, ensure final parameters are converted back to `Array` before being passed to the database driver.
