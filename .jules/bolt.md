@@ -12,3 +12,7 @@
 ## 2025-05-25 - [Preventive Deduplication vs Post-processing]
 **Learning:** In `Entry.getNodes`, the pattern of pushing all potential nodes to an array and then deduplicating with `JSON.stringify` was a major bottleneck. Replacing it with an in-loop `Set` check for unique IDs improved performance by ~90% (35ms -> 3.4ms for 10k edges).
 **Action:** Avoid post-processing deduplication for large arrays when you can track uniqueness during the initial population of the array. Never use `JSON.stringify` as a key for deduplication if a unique ID is available.
+
+## 2026-04-24 - [Optimized CypherQuery.addStatement with Set and Log Removal]
+**Learning:** Replaced O(N) array-based deduplication with O(1) `Set` lookups and removed expensive `JSON.stringify` logging of large objects in `CypherQuery.addStatement`. The logging alone was a massive bottleneck for large statements, and the deduplication overhead scaled poorly with the number of concepts and mentions. Benchmark showed a 26x performance improvement (~12.3s to ~460ms).
+**Action:** Always avoid logging large objects in production paths and prefer `Set` for tracking unique items in loops to ensure O(1) performance.
