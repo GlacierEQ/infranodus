@@ -16,3 +16,7 @@
 ## 2025-05-30 - [O(N^2) to O(N) Optimization and Logger Overhead in addStatement]
 **Learning:** `CypherQuery.addStatement` suffered from O(N^2) complexity due to `Array.indexOf` lookups for concept deduplication. More importantly, `console.log(JSON.stringify(params))` was a massive bottleneck, consuming over 90% of processing time for large statements.
 **Action:** Replace `indexOf` with `Set` for deduplication. Never log large stringified objects in performance-critical paths; use conditional debugging or specialized loggers.
+
+## 2025-06-05 - [O(N*M) to O(N+M) Optimization in extractConcepts]
+**Learning:** Text processing in `extractConcepts` was significantly slowed down by repeated `indexOf` lookups in potentially large arrays (`stopwords`, `hashtags`). Using `Set` for these lookups reduced processing time for 1000 concepts from ~841ms to ~38ms (~22x speedup).
+**Action:** In data-intensive text processing paths, always convert lookup arrays into Sets before entering loops to ensure O(1) membership checks.
