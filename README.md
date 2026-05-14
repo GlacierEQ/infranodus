@@ -221,3 +221,4 @@ In some parts the code from the book ["Node.js in Action"](http://www.manning.co
 Any source code files provided as a supplement to the book are freely available to the public for download. Reuse of the code is permitted, in whole or in part, including the creation of derivative works, provided that you acknowledge that you are using it and identify the source: title, publisher and year.
 
 Some parts of this code may come under a different license if specified within.
+\n## Development\n\nRun `npm install --ignore-scripts` to install dependencies without executing optional postinstall scripts. Then run `npm test` to execute the test suite.

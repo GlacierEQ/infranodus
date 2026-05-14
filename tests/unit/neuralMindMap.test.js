@@ -241,4 +241,21 @@ describe('NeuralMindMap', () => {
 
         test('should merge mind maps and return result', async () => {
             // Setup
-            neuralMindMap._performNeuralMerge = jest.fn().mockResolvedValue({
+            const mergedResult = {
+                id: 'merged-map',
+                nodes: [
+                    { id: 'node1', name: 'Node 1' },
+                    { id: 'node2', name: 'Node 2' }
+                ],
+                connections: [],
+                clusters: [],
+                crossContextMetrics: { connections: 1 }
+            };
+            neuralMindMap._performNeuralMerge = jest.fn().mockResolvedValue(mergedResult);
+            const result = await neuralMindMap.mergeNeuralMindMaps(mockUserId, mockContexts, targetContext);
+            expect(result).toEqual(mergedResult);
+            expect(neuralMindMap.conceptMaps.get(`${mockUserId}-${targetContext}`)).toBe(result);
+            expect(neuralMindMap._performNeuralMerge).toHaveBeenCalled();
+        });
+    });
+});
